@@ -34,6 +34,12 @@ const ERROR_TEXT: Record<string, PlayerError> = {
   },
 };
 
+const FALLBACK_ERROR: PlayerError = { message: "Video tidak dapat diputar." };
+
+function errText(key: string): PlayerError {
+  return ERROR_TEXT[key] ?? FALLBACK_ERROR;
+}
+
 function PlayerFailure({ error, source, onRetry }: { error: PlayerError; source: ResolvedSource; onRetry: () => void }) {
   return (
     <div className="flex h-full flex-col items-center justify-center gap-3 p-6 text-center">
@@ -72,7 +78,7 @@ function IframeEngine({ source, title, onError }: { source: ResolvedSource; titl
         allow={isYoutube ? "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" : "fullscreen; encrypted-media; picture-in-picture"}
         allowFullScreen
         onLoad={() => setLoading(false)}
-        onError={() => onError(ERROR_TEXT["embed-blocked"])}
+        onError={() => onError(errText("embed-blocked"))}
         className="h-full w-full border-0"
       />
     </>
@@ -81,10 +87,10 @@ function IframeEngine({ source, title, onError }: { source: ResolvedSource; titl
 
 function mapMediaError(code: number | undefined): PlayerError {
   switch (code) {
-    case MediaError.MEDIA_ERR_NETWORK: return ERROR_TEXT["network"];
-    case MediaError.MEDIA_ERR_DECODE: return ERROR_TEXT["media-format"];
-    case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED: return ERROR_TEXT["media-src"];
-    default: return ERROR_TEXT["media-src"];
+    case MediaError.MEDIA_ERR_NETWORK: return errText("network");
+    case MediaError.MEDIA_ERR_DECODE: return errText("media-format");
+    case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED: return errText("media-src");
+    default: return errText("media-src");
   }
 }
 
@@ -118,17 +124,17 @@ function HlsEngine({ source, onError }: { source: ResolvedSource; onError: (e: P
       let cancelled = false;
       void import("hls.js").then(({ default: Hls }) => {
         if (cancelled || destroyed) return;
-        if (!Hls.isSupported()) { onError(ERROR_TEXT["media-format"]); return; }
+        if (!Hls.isSupported()) { onError(errText("media-format")); return; }
         hls = new Hls({ enableWorker: true });
         hls.on(Hls.Events.ERROR, (_event, data) => {
           if (!data.fatal) return;
-          if (data.type === Hls.ErrorTypes.NETWORK_ERROR) onError(ERROR_TEXT["network"]);
-          else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) onError(ERROR_TEXT["media-format"]);
-          else onError(ERROR_TEXT["media-src"]);
+          if (data.type === Hls.ErrorTypes.NETWORK_ERROR) onError(errText("network"));
+          else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) onError(errText("media-format"));
+          else onError(errText("media-src"));
         });
         hls.loadSource(source.playUrl);
         hls.attachMedia(video);
-      }).catch(() => { if (!cancelled) onError(ERROR_TEXT["media-format"]); });
+      }).catch(() => { if (!cancelled) onError(errText("media-format")); });
     }
 
     const onPlaying = () => setLoading(false);
@@ -166,11 +172,11 @@ function DashEngine({ source, onError }: { source: ResolvedSource; onError: (e: 
       player = dashjs.MediaPlayer().create();
       player.on(dashjs.MediaPlayer.events.ERROR, (event) => {
         const code = (event as { error?: { code?: number } }).error?.code;
-        if (code === 25 || code === 27) onError(ERROR_TEXT["drm"]); // key session / key system access
-        else onError(ERROR_TEXT["media-src"]);
+        if (code === 25 || code === 27) onError(errText("drm")); // key session / key system access
+        else onError(errText("media-src"));
       });
       player.initialize(video, source.playUrl, false);
-    }).catch(() => { if (!cancelled) onError(ERROR_TEXT["media-format"]); });
+    }).catch(() => { if (!cancelled) onError(errText("media-format")); });
 
     const onPlaying = () => setLoading(false);
     const onVideoError = () => onError(mapMediaError(video.error?.code));
@@ -201,12 +207,12 @@ export function UniversalPlayer({ embedUrl, title }: PlayerProps) {
   const source = resolveSource(embedUrl);
   const [attempt, setAttempt] = useState(0);
   const [error, setError] = useState<PlayerError | null>(
-    source.kind === "invalid" ? (ERROR_TEXT[source.reason ?? "invalid-url"] ?? ERROR_TEXT["invalid-url"]) : null,
+    source.kind === "invalid" ? errText(source.reason ?? "invalid-url") : null,
   );
 
   useEffect(() => {
     setAttempt(0);
-    setError(source.kind === "invalid" ? (ERROR_TEXT[source.reason ?? "invalid-url"] ?? ERROR_TEXT["invalid-url"]) : null);
+    setError(source.kind === "invalid" ? errText(source.reason ?? "invalid-url") : null);
   }, [embedUrl, source.kind, source.reason]);
 
   const retry = () => { setError(null); setAttempt((n) => n + 1); };

@@ -35,7 +35,7 @@ const DIRECT_MIME: Record<string, string> = {
 
 function extensionOf(pathname: string): string {
   const match = /\.([a-z0-9]+)$/i.exec(pathname);
-  return match ? match[1].toLowerCase() : "";
+  return match?.[1]?.toLowerCase() ?? "";
 }
 
 /** Extract a YouTube video id from watch/share/embed/shorts URL variations. */
@@ -56,7 +56,7 @@ export function youtubeVideoId(url: URL): string | null {
     id = url.searchParams.get("v");
   } else {
     const match = /^\/(embed|shorts|live|v)\/([^/?#]+)/.exec(url.pathname);
-    id = match ? match[2] : null;
+    id = match?.[2] ?? null;
   }
   return id && /^[\w-]{6,20}$/.test(id) ? id : null;
 }
@@ -96,8 +96,9 @@ export function resolveSource(raw: string): ResolvedSource {
   const ext = extensionOf(url.pathname);
   if (ext === "m3u8") return { kind: "hls", url: value, playUrl: url.href };
   if (ext === "mpd") return { kind: "dash", url: value, playUrl: url.href };
-  if (ext in DIRECT_MIME) {
-    return { kind: "direct", url: value, playUrl: url.href, mimeType: DIRECT_MIME[ext] };
+  const mimeType = DIRECT_MIME[ext];
+  if (mimeType) {
+    return { kind: "direct", url: value, playUrl: url.href, mimeType };
   }
 
   return { kind: "iframe", url: value, playUrl: url.href };
