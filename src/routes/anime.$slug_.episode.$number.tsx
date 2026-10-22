@@ -10,7 +10,7 @@ import { Dialog, DialogPortal, DialogOverlay, DialogTitle, DialogDescription, Di
 import { Input } from "@/components/ui/input";
 import { ResourceError, ResourceNotFound } from "@/components/ResourceState";
 import { Button } from "@/components/ui/button";
-import { playableEmbedUrl } from "@/lib/player";
+import { UniversalPlayer } from "@/components/player/UniversalPlayer";
 import { PageSkeleton } from "@/components/PageSkeleton";
 
 export const Route = createFileRoute("/anime/$slug_/episode/$number")({
