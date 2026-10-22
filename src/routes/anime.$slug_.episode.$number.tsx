@@ -84,9 +84,7 @@ function EpisodePage() {
       </DialogPortal>
     </Dialog>
     <div className="mx-auto w-full md:w-[min(100%,calc((100dvh_-_var(--ep-chrome))*16/9))]">
-      <div className="aspect-video w-full overflow-hidden rounded-md border border-border bg-card">
-        {embed ? <iframe src={embed} title={title} loading="lazy" referrerPolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-presentation" allow="fullscreen" allowFullScreen className="h-full w-full border-0" /> : <div className="flex h-full items-center justify-center p-4 text-center text-muted-foreground">Video belum tersedia</div>}
-      </div>
+      <UniversalPlayer embedUrl={episode.embedUrl} title={title} />
       <div aria-label="Navigasi episode" className="mt-3 grid max-h-12 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2">
         {previous ? <Button asChild variant="outline" className="justify-self-start px-3" title="Sebelumnya"><Link aria-label="Sebelumnya" to="/anime/$slug/episode/$number" params={{ slug: anime.slug, number: String(previous.number) }}><ArrowLeft /><span className="hidden md:inline">Sebelumnya</span></Link></Button> : <Button variant="outline" disabled aria-label="Sebelumnya" className="justify-self-start px-3" title="Sebelumnya"><ArrowLeft /><span className="hidden md:inline">Sebelumnya</span></Button>}
         <Button variant="secondary" className="min-w-0 px-3" onClick={() => setOpen(true)}><List />Daftar Episode</Button>
