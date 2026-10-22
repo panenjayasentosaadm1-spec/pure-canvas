@@ -45,7 +45,6 @@ function EpisodePage() {
   const index = episodes.findIndex((item) => item.id === episode.id);
   const previous = episodes[index - 1];
   const next = episodes[index + 1];
-  const embed = playableEmbedUrl(episode.embedUrl);
   const title = `${anime.title} - Episode ${episode.number}`;
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
