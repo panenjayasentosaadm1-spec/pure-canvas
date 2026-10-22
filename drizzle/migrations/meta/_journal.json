@@ -1,0 +1,20 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1792473061384,
+      "tag": "0000_usaginime_phase1",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792473285496,
+      "tag": "0001_anime_type_episode_thumbnails",
+      "breakpoints": true
+    }
+  ]
+}

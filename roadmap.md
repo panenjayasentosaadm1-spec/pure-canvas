@@ -1,0 +1,14 @@
+- [x] Polish home links, URL filters, mobile layout, metadata, images, copyright and not-found states; use automatic typecheck/build only.
+- [x] Add published-only anime detail and episode pages.
+- [x] Replace admin UI authentication with mock auth and counts.
+- [x] Remove Supabase Preview session brokering without changing mock admin behavior.
+- [ ] Verify the independent Supabase schema, production environment, and real authentication flow; requires access to the user's target project and a real Supabase login flow.
+- [x] Check automatic production build results after the storage change (build OK).
+- [x] Translate about/copyright; verify tests and preview build.
+- [x] Rework anime information, episode controls, and responsive episode picker.
+- [x] Verify anime detail, episode navigation, mobile picker, and build status.
+- [x] Complete episode selection, shared create/edit form, list, deletion, and API validation.
+- [x] Check episode rule validation and automatic build/typecheck results; do not run browser/UI testing.- [x] Load public store pages client-only with skeletons; episode-based "Anime Terbaru" (15) and paginated /terbaru (30/page).
+- [x] Phase 1: audit existing content APIs, callers, real authentication, and configured database columns without schema changes.
+- [ ] Phase 1: migrate content reads and authorized mutations, preserve image handling and UI, and remove production mock fallbacks.
+- [ ] Phase 1: test API visibility, authorization failures, mappings and relationships; inspect automatic build results and report external verification blockers.

@@ -1,0 +1,20 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { Plus, Search } from "lucide-react";
+import { adminSnapshotQuery } from "@/api/admin-queries";
+import { AnimeActions } from "@/components/admin/AnimeActions";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { adminHead } from "@/lib/admin-head";
+import { formatDate, typeLabel, statusLabel } from "@/lib/format";
+export const Route = createFileRoute("/admin/anime/")({ loader: ({ context }) => context.queryClient.ensureQueryData(adminSnapshotQuery), head: () => adminHead("Daftar anime"), component: AnimeList });
+function AnimeList() {
+  const { data } = useSuspenseQuery(adminSnapshotQuery);
+  const [query, setQuery] = useState(""); const [type, setType] = useState(""); const [status, setStatus] = useState(""); const [published, setPublished] = useState("");
+  const items = data.anime.filter((anime) => anime.title.toLocaleLowerCase("id").includes(query.toLocaleLowerCase("id")) && (!type || anime.type === type) && (!status || anime.status === status) && (!published || anime.isPublished === (published === "yes")));
+  const selectClass = "h-10 rounded-md border border-input bg-background px-3 text-sm";
+  return <section><div className="flex flex-wrap items-center justify-between gap-4"><h1 className="text-3xl font-bold tracking-normal">Anime</h1><Button asChild><Link to="/admin/anime/baru"><Plus />Tambah Anime</Link></Button></div><div className="my-6 flex flex-wrap gap-3"><div className="relative min-w-48 flex-1"><Search className="absolute left-3 top-3 size-4 text-muted-foreground" /><Input aria-label="Cari judul anime" placeholder="Cari judul anime" className="h-10 pl-9" value={query} onChange={(event) => setQuery(event.target.value)} /></div><select aria-label="Filter tipe" className={selectClass} value={type} onChange={(event) => setType(event.target.value)}><option value="">Semua tipe</option>{Object.entries(typeLabel).map(([value, label]) => <option value={value} key={value}>{label}</option>)}</select><select aria-label="Filter status" className={selectClass} value={status} onChange={(event) => setStatus(event.target.value)}><option value="">Semua status</option>{Object.entries(statusLabel).map(([value, label]) => <option value={value} key={value}>{label}</option>)}</select><select aria-label="Filter publikasi" className={selectClass} value={published} onChange={(event) => setPublished(event.target.value)}><option value="">Semua publikasi</option><option value="yes">Terbit</option><option value="no">Draf</option></select></div>
+    <div className="min-w-0 max-w-full overflow-x-auto rounded-md border border-border"><table className="w-full min-w-[980px] text-left text-sm"><thead className="bg-card text-muted-foreground"><tr>{["Anime", "Tipe", "Status", "Publikasi", "Episode", "Diperbarui", "Tindakan"].map((label) => <th key={label} className="px-4 py-4 font-medium">{label}</th>)}</tr></thead><tbody className="divide-y divide-border">{items.map((anime) => <tr key={anime.id}><td className="px-4 py-3"><div className="flex items-center gap-3">{anime.posterUrl ? <img src={anime.posterUrl} alt={anime.title} loading="lazy" className="h-16 w-11 rounded-sm object-cover" /> : <div className="h-16 w-11 rounded-sm bg-muted" />}<span className="max-w-56 font-semibold">{anime.title}</span></div></td><td className="px-4">{typeLabel[anime.type]}</td><td className="px-4">{statusLabel[anime.status]}</td><td className="px-4"><span className={`rounded-sm px-2 py-1 text-xs ${anime.isPublished ? "bg-accent text-primary" : "bg-muted text-muted-foreground"}`}>{anime.isPublished ? "Terbit" : "Draf"}</span></td><td className="px-4">{data.episodes.filter((episode) => episode.animeId === anime.id).length}</td><td className="whitespace-nowrap px-4">{formatDate(anime.updatedAt)}</td><td className="px-4"><AnimeActions anime={anime} /></td></tr>)}</tbody></table>{items.length === 0 && <p className="p-10 text-center text-muted-foreground">Tidak ada anime yang cocok.</p>}</div>
+  </section>;
+}
