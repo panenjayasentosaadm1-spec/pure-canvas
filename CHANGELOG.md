@@ -1,0 +1,10 @@
+# Changelog
+
+## 2026-10-24 — Phase 1 Supabase migration: schema alignment + verification
+
+- **Schema alignment:** TypeScript database types (`src/integrations/supabase/types.ts`, `src/integrations/supabase/db-types.ts`) aligned to the re-checked live schema (verified via the PostgREST OpenAPI spec on 2026-10-24). The doc-based column names `poster_path`, `number`, `thumbnail_path`, `alt_title`, `logo_path` were replaced with the actual live columns `anime.poster_url`, `episodes.episode_number`, `episodes.thumbnail_url`, `site_settings.logo_url`. Unsupported anime detail fields (`alt_title`, `studio`, `rating`, `duration_minutes`, `total_episodes`) were removed from the types — these columns do not exist live.
+- **Migrated APIs:** `src/api/anime.ts`, `episodes.ts`, `tags.ts`, `settings.ts`, plus `hero.ts` and `ad-slots.ts` now read/write the external Supabase project through shared helpers in `src/api/backend.ts`. Public reads return published anime only, and hide episodes whose parent anime is unpublished. `anime_tags` relationships preserved; admin mutations go through the authenticated client with the existing `has_role` admin check and RLS. No production mock-data fallback — the mock store remains test/fixture only.
+- **Ads & hero:** Ads Management uses `site_settings.ad_slots` + the atomic role-checked `save_ad_slot` RPC (`docs/ad-slots-setup.sql`). Featured Anime Hero config targets `site_settings.hero` (`docs/hero-setup.sql`, **not yet applied live**); code degrades gracefully without the column.
+- **Verification (previous session, recorded here — not rerun in the docs session):** TypeScript check pass; 120 tests across 12 files all pass; production build pass; homepage browser verification pass.
+- **Still open:** apply `docs/hero-setup.sql`; verify RLS policies, admin mutations with a real admin account, and hosted image/ad behavior.
+- _Note: no changelog existed before this entry; earlier work (public pages, admin UI, image pipeline, embed security, ad slots) predates this file._

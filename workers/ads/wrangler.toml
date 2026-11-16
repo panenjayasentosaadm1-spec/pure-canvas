@@ -1,0 +1,5 @@
+name = "usaginime-ads"
+main = "index.js"
+compatibility_date = "2025-01-01"
+routes = [{ pattern = "ads.usaginime.online", custom_domain = true }]
+# Set vars in the Cloudflare dashboard: SUPABASE_URL, SUPABASE_ANON_KEY (publishable key only)
