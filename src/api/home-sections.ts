@@ -1,6 +1,7 @@
 import type { Anime } from "./types";
 
 const SECTION_LIMIT = 10;
+const ONGOING_LIMIT = 12;
 
 export function selectHomeAnimeSections(published: Anime[]) {
   const publicAnime = published.filter((anime) => anime.isPublished);
@@ -12,7 +13,7 @@ export function selectHomeAnimeSections(published: Anime[]) {
     ongoing: publicAnime
       .filter((anime) => anime.status === "ongoing")
       .sort(byTitle)
-      .slice(0, SECTION_LIMIT),
+      .slice(0, ONGOING_LIMIT),
     completed: publicAnime
       .filter((anime) => anime.status === "completed" && anime.type === "tv")
       .sort(byTitle)

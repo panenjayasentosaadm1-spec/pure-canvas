@@ -75,7 +75,7 @@ function HomeRoute() {
 function Index() {
   const { data: latest } = useSuspenseQuery(latestEpisodesQuery);
   const { data: sections } = useSuspenseQuery(homeSectionsQuery);
-  const newest = latest.slice(0, 15);
+  const newest = latest.slice(0, 12);
   const [firstRowSize, setFirstRowSize] = useState(2);
   useEffect(() => {
     const tablet = window.matchMedia("(min-width: 768px)");
@@ -163,8 +163,8 @@ function AnimeSection({ title, className, to = "/anime", search, items, badge, c
     <section className={className}>
       <SectionHeading title={title} to={to} search={search} />
       <PosterGrid className={compact ? "grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10" : "mx-auto max-w-6xl"}>
-        {items.map(({ anime, imageUrl }) => (
-          <Link key={anime.id} to="/anime/$slug" params={{ slug: anime.slug }} aria-label={anime.title}>
+        {items.map(({ anime, imageUrl }, index) => (
+          <Link key={anime.id} to="/anime/$slug" params={{ slug: anime.slug }} aria-label={anime.title} className={compact ? compactVisibility(index) : undefined}>
             <PosterCard
               title={anime.title}
               posterUrl={imageUrl}
@@ -177,6 +177,13 @@ function AnimeSection({ title, className, to = "/anime", search, items, badge, c
       </PosterGrid>
     </section>
   );
+}
+
+// Kartu terlihat: mobile 6, sm 8, md/lg 6, xl 8, 2xl 10 (baris selalu penuh).
+function compactVisibility(index: number) {
+  if (index < 6) return undefined;
+  if (index < 8) return "hidden sm:block md:hidden xl:block";
+  return "hidden 2xl:block";
 }
 
 function SectionHeading({ title, subtitle, className, to = "/anime", search, as: Heading = "h2" }: {
